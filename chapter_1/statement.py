@@ -48,14 +48,14 @@ class Statement:
     def total_amount(self) -> int:
         result: int = 0
         for perf in self.invoice["performances"]:
-            result += self.amount_for(perf)
+            result += perf["amount"]
         return result
 
     def render_plain_text(self, data: Dict[str, Any], plays: Dict[str, Any]) -> str:
         result = f'Statement for {data["customer"]}\n'
 
         for perf in data["performances"]:
-            result += f'    {perf["play"]["name"]}: {Statement.usd(self.amount_for(perf))} ({perf["audience"]} seats)\n'
+            result += f'    {perf["play"]["name"]}: {Statement.usd(perf["amount"])} ({perf["audience"]} seats)\n'
         result += f'Amount owed is {Statement.usd(self.total_amount())}\n'
         result += f'You earned {self.total_volume_credits()} credits\n'
         return result
@@ -63,6 +63,7 @@ class Statement:
     def enrich_performance(self, a_performance: Dict[str, Any]) -> Dict[str, Any]:
         result = a_performance
         result["play"] = self.play_for(a_performance)
+        result["amount"] = self.amount_for(result)
         return result
 
     def statement(self, invoice: Dict[str, Any], plays: Dict[str, Any]) -> str:
