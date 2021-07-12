@@ -14,17 +14,17 @@ class Statement:
 
     def amount_for(self, a_performance: Dict[str, Any]) -> int:
         result: int = 0
-        if self.play_for(a_performance)["type"] == "tragedy":
+        if a_performance["play"]["type"] == "tragedy":
             result = 40000
             if a_performance["audience"] > 30:
                 result += 1000 * (a_performance["audience"] - 30)
-        elif self.play_for(a_performance)["type"] == "comedy":
+        elif a_performance["play"]["type"] == "comedy":
             result = 30000
             if a_performance['audience'] > 20:
                 result += 10000 + 500 * (a_performance["audience"] - 20)
             result += 300 * a_performance["audience"]
         else:
-            raise Exception(f'Unknown type: {self.play_for(a_performance)["type"]}')
+            raise Exception(f'Unknown type: {a_performance["play"]["type"]}')
         return result
 
     def play_for(self, a_performance: Dict[str, Any]) -> Dict[str, Any]:
@@ -35,7 +35,7 @@ class Statement:
         # add volume credits
         result += max(a_performance['audience'] - 30, 0)
         # add extra credits for every ten comedy attendees
-        if 'comedy' == self.play_for(a_performance)["type"]:
+        if 'comedy' == a_performance["play"]["type"]:
             result += floor(a_performance["audience"] / 5)
         return result
 
@@ -51,13 +51,25 @@ class Statement:
             result += self.amount_for(perf)
         return result
 
-    def statement(self, invoice: Dict[str, Any], plays: Dict[str, Any]) -> str:
-        self.plays = plays
-        self.invoice = invoice
-        result = f'Statement for {invoice["customer"]}\n'
+    def render_plain_text(self, data: Dict[str, Any], plays: Dict[str, Any]) -> str:
+        result = f'Statement for {data["customer"]}\n'
 
-        for perf in invoice["performances"]:
-            result += f'    {self.play_for(perf)["name"]}: {Statement.usd(self.amount_for(perf))} ({perf["audience"]} seats)\n'
+        for perf in data["performances"]:
+            result += f'    {perf["play"]["name"]}: {Statement.usd(self.amount_for(perf))} ({perf["audience"]} seats)\n'
         result += f'Amount owed is {Statement.usd(self.total_amount())}\n'
         result += f'You earned {self.total_volume_credits()} credits\n'
         return result
+
+    def enrich_performance(self, a_performance: Dict[str, Any]) -> Dict[str, Any]:
+        result = a_performance
+        result["play"] = self.play_for(a_performance)
+        return result
+
+    def statement(self, invoice: Dict[str, Any], plays: Dict[str, Any]) -> str:
+        self.plays = plays
+        self.invoice = invoice
+        statement_data: Dict[str, Any] = {}
+        statement_data["customer"] = invoice["customer"]
+        statement_data["performances"] = list(map(self.enrich_performance, invoice["performances"]))
+
+        return self.render_plain_text(statement_data, plays)
