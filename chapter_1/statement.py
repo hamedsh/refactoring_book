@@ -40,20 +40,24 @@ class Statement:
         return result
 
     def total_volume_credits(self) -> int:
-        volume_credits: int = 0
+        result: int = 0
         for perf in self.invoice["performances"]:
-            volume_credits += self.volume_credits_for(perf)
-        return volume_credits
+            result += self.volume_credits_for(perf)
+        return result
+
+    def total_amount(self) -> int:
+        result: int = 0
+        for perf in self.invoice["performances"]:
+            result += self.amount_for(perf)
+        return result
 
     def statement(self, invoice: Dict[str, Any], plays: Dict[str, Any]) -> str:
         self.plays = plays
         self.invoice = invoice
-        total_amount: int = 0
         result = f'Statement for {invoice["customer"]}\n'
 
         for perf in invoice["performances"]:
             result += f'    {self.play_for(perf)["name"]}: {Statement.usd(self.amount_for(perf))} ({perf["audience"]} seats)\n'
-            total_amount += self.amount_for(perf)
-        result += f'Amount owed is {Statement.usd(total_amount)}\n'
+        result += f'Amount owed is {Statement.usd(self.total_amount())}\n'
         result += f'You earned {self.total_volume_credits()} credits\n'
         return result
