@@ -54,7 +54,6 @@ class Statement:
         for perf in invoice["performances"]:
             result += f'    {self.play_for(perf)["name"]}: {Statement.usd(self.amount_for(perf))} ({perf["audience"]} seats)\n'
             total_amount += self.amount_for(perf)
-        volume_credits: int = self.total_volume_credits()
         result += f'Amount owed is {Statement.usd(total_amount)}\n'
-        result += f'You earned {volume_credits} credits\n'
+        result += f'You earned {self.total_volume_credits()} credits\n'
         return result
