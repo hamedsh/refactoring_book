@@ -36,14 +36,13 @@ class Statement:
         result = f'Statement for {invoice["customer"]}\n'
 
         for perf in invoice["performances"]:
-            this_amount = self.amount_for(perf)
             # add volume credits
             volume_credits += max(perf['audience'] - 30, 0)
             # add extra credits for every ten comedy attendees
             if 'comedy' == self.play_for(perf)["type"]:
                 volume_credits += floor(perf["audience"]/5)
-            result += f'    {self.play_for(perf)["name"]}: {Statement.format_currency(this_amount/100)} ({perf["audience"]} seats)\n'
-            total_amount += this_amount
+            result += f'    {self.play_for(perf)["name"]}: {Statement.format_currency(self.amount_for(perf)/100)} ({perf["audience"]} seats)\n'
+            total_amount += self.amount_for(perf)
         result += f'Amount owed is {Statement.format_currency(total_amount/100)}\n'
         result += f'You earned {volume_credits} credits\n'
         return result
