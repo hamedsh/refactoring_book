@@ -42,7 +42,7 @@ class Statement:
     def total_volume_credits(self) -> int:
         result: int = 0
         for perf in self.invoice["performances"]:
-            result += self.volume_credits_for(perf)
+            result += perf["volume_credits"]
         return result
 
     def total_amount(self) -> int:
@@ -64,6 +64,7 @@ class Statement:
         result = a_performance
         result["play"] = self.play_for(a_performance)
         result["amount"] = self.amount_for(result)
+        result["volume_credits"] = self.volume_credits_for(result)
         return result
 
     def statement(self, invoice: Dict[str, Any], plays: Dict[str, Any]) -> str:
