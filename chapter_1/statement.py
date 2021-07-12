@@ -39,25 +39,25 @@ class Statement:
             result += floor(a_performance["audience"] / 5)
         return result
 
-    def total_volume_credits(self) -> int:
+    def total_volume_credits(self, data: Dict[str, Any]) -> int:
         result: int = 0
-        for perf in self.invoice["performances"]:
+        for perf in data["performances"]:
             result += perf["volume_credits"]
         return result
 
-    def total_amount(self) -> int:
+    def total_amount(self, data: Dict[str, Any]) -> int:
         result: int = 0
-        for perf in self.invoice["performances"]:
+        for perf in data["performances"]:
             result += perf["amount"]
         return result
 
-    def render_plain_text(self, data: Dict[str, Any], plays: Dict[str, Any]) -> str:
+    def render_plain_text(self, data: Dict[str, Any]) -> str:
         result = f'Statement for {data["customer"]}\n'
 
         for perf in data["performances"]:
             result += f'    {perf["play"]["name"]}: {Statement.usd(perf["amount"])} ({perf["audience"]} seats)\n'
-        result += f'Amount owed is {Statement.usd(self.total_amount())}\n'
-        result += f'You earned {self.total_volume_credits()} credits\n'
+        result += f'Amount owed is {Statement.usd(data["total_amount"])}\n'
+        result += f'You earned {data["total_volume_credits"]} credits\n'
         return result
 
     def enrich_performance(self, a_performance: Dict[str, Any]) -> Dict[str, Any]:
@@ -73,5 +73,7 @@ class Statement:
         statement_data: Dict[str, Any] = {}
         statement_data["customer"] = invoice["customer"]
         statement_data["performances"] = list(map(self.enrich_performance, invoice["performances"]))
+        statement_data["total_amount"] = self.total_amount(statement_data)
+        statement_data["total_volume_credits"] = self.total_volume_credits(statement_data)
 
-        return self.render_plain_text(statement_data, plays)
+        return self.render_plain_text(statement_data)
