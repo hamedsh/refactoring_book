@@ -6,6 +6,7 @@ class Statement:
 
     def __init__(self) -> None:
         self.plays: Dict[str, Any] = {}
+        self.invoice: Dict[str, Any] = {}
 
     @staticmethod
     def usd(value: float) -> str:
@@ -38,17 +39,22 @@ class Statement:
             result += floor(a_performance["audience"] / 5)
         return result
 
+    def total_volume_credits(self) -> int:
+        volume_credits: int = 0
+        for perf in self.invoice["performances"]:
+            volume_credits += self.volume_credits_for(perf)
+        return volume_credits
+
     def statement(self, invoice: Dict[str, Any], plays: Dict[str, Any]) -> str:
         self.plays = plays
+        self.invoice = invoice
         total_amount: int = 0
         result = f'Statement for {invoice["customer"]}\n'
 
         for perf in invoice["performances"]:
             result += f'    {self.play_for(perf)["name"]}: {Statement.usd(self.amount_for(perf))} ({perf["audience"]} seats)\n'
             total_amount += self.amount_for(perf)
-        volume_credits: int = 0
-        for perf in invoice["performances"]:
-            volume_credits += self.volume_credits_for(perf)
+        volume_credits: int = self.total_volume_credits()
         result += f'Amount owed is {Statement.usd(total_amount)}\n'
         result += f'You earned {volume_credits} credits\n'
         return result
