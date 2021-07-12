@@ -8,8 +8,8 @@ class Statement:
         self.plays: Dict[str, Any] = {}
 
     @staticmethod
-    def format_currency(value: float) -> str:
-        return f'${value:,.2f}'
+    def usd(value: float) -> str:
+        return f'${value/100:,.2f}'
 
     def amount_for(self, a_performance: Dict[str, Any]) -> int:
         result: int = 0
@@ -46,8 +46,8 @@ class Statement:
 
         for perf in invoice["performances"]:
             volume_credits += self.volume_credits_for(perf)
-            result += f'    {self.play_for(perf)["name"]}: {Statement.format_currency(self.amount_for(perf)/100)} ({perf["audience"]} seats)\n'
+            result += f'    {self.play_for(perf)["name"]}: {Statement.usd(self.amount_for(perf))} ({perf["audience"]} seats)\n'
             total_amount += self.amount_for(perf)
-        result += f'Amount owed is {Statement.format_currency(total_amount/100)}\n'
+        result += f'Amount owed is {Statement.usd(total_amount)}\n'
         result += f'You earned {volume_credits} credits\n'
         return result
