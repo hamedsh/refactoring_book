@@ -12,7 +12,8 @@ Statement for BigCo
 Amount owed is $1,730.00
 You earned 47 credits
 '''
-    result = Statement.statement(
+    statement_calculator = Statement()
+    result = statement_calculator.statement(
         json.load(open('invoices.json'))[0],
         json.load(open('plays.json')),
     )

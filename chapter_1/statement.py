@@ -4,6 +4,9 @@ from typing import Dict, Any
 
 class Statement:
 
+    def __init__(self) -> None:
+        self.plays: Dict[str, Any] = {}
+
     @staticmethod
     def format_currency(value: float) -> str:
         return f'${value:,.2f}'
@@ -24,14 +27,17 @@ class Statement:
             raise Exception(f'Unknown type: {play["type"]}')
         return result
 
-    @staticmethod
-    def statement(invoice: Dict[str, Any], plays: Dict[str, Any]) -> str:
+    def play_for(self, a_performance: Dict[str, Any]) -> Dict[str, Any]:
+        return self.plays[a_performance["playID"]]
+
+    def statement(self, invoice: Dict[str, Any], plays: Dict[str, Any]) -> str:
+        self.plays = plays
         total_amount: int = 0
         volume_credits: int = 0
         result = f'Statement for {invoice["customer"]}\n'
 
         for perf in invoice["performances"]:
-            play = plays[perf["playID"]]
+            play = self.play_for(perf)
             this_amount = Statement.amount_for(perf, play)
             # add volume credits
             volume_credits += max(perf['audience'] - 30, 0)
