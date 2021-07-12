@@ -1,3 +1,4 @@
+from functools import reduce
 from math import floor
 from typing import Dict, Any
 
@@ -40,16 +41,10 @@ class Statement:
         return result
 
     def total_volume_credits(self, data: Dict[str, Any]) -> int:
-        result: int = 0
-        for perf in data["performances"]:
-            result += perf["volume_credits"]
-        return result
+        return sum(item["volume_credits"] for item in data["performances"])
 
     def total_amount(self, data: Dict[str, Any]) -> int:
-        result: int = 0
-        for perf in data["performances"]:
-            result += perf["amount"]
-        return result
+        return sum(item["amount"] for item in data["performances"])
 
     def render_plain_text(self, data: Dict[str, Any]) -> str:
         result = f'Statement for {data["customer"]}\n'
