@@ -9,6 +9,22 @@ class Statement:
         return f'${value:,.2f}'
 
     @staticmethod
+    def amount_for(a_performance: Dict[str, Any], play: Dict[str, Any]) -> int:
+        result: int = 0
+        if play["type"] == "tragedy":
+            result = 40000
+            if a_performance["audience"] > 30:
+                result += 1000 * (a_performance["audience"] - 30)
+        elif play["type"] == "comedy":
+            result = 30000
+            if a_performance['audience'] > 20:
+                result += 10000 + 500 * (a_performance["audience"] - 20)
+            result += 300 * a_performance["audience"]
+        else:
+            raise Exception(f'Unknown type: {play["type"]}')
+        return result
+
+    @staticmethod
     def statement(invoice: Dict[str, Any], plays: Dict[str, Any]) -> str:
         total_amount: int = 0
         volume_credits: int = 0
@@ -16,19 +32,7 @@ class Statement:
 
         for perf in invoice["performances"]:
             play = plays[perf["playID"]]
-            this_amount = 0
-
-            if play["type"] == "tragedy":
-                this_amount = 40000
-                if perf["audience"] > 30:
-                    this_amount += 1000 * (perf["audience"] - 30)
-            elif play["type"] == "comedy":
-                this_amount = 30000
-                if perf['audience'] > 20:
-                    this_amount += 10000 + 500 * (perf["audience"] - 20)
-                this_amount += 300 * perf["audience"]
-            else:
-                raise Exception(f'Unknown type: {play["type"]}')
+            this_amount = Statement.amount_for(perf, play)
             # add volume credits
             volume_credits += max(perf['audience'] - 30, 0)
             # add extra credits for every ten comedy attendees
