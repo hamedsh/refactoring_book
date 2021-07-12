@@ -41,12 +41,12 @@ class Statement:
     def statement(self, invoice: Dict[str, Any], plays: Dict[str, Any]) -> str:
         self.plays = plays
         total_amount: int = 0
-        volume_credits: int = 0
         result = f'Statement for {invoice["customer"]}\n'
 
         for perf in invoice["performances"]:
             result += f'    {self.play_for(perf)["name"]}: {Statement.usd(self.amount_for(perf))} ({perf["audience"]} seats)\n'
             total_amount += self.amount_for(perf)
+        volume_credits: int = 0
         for perf in invoice["performances"]:
             volume_credits += self.volume_credits_for(perf)
         result += f'Amount owed is {Statement.usd(total_amount)}\n'
