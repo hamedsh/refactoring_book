@@ -62,13 +62,16 @@ class Statement:
         result["volume_credits"] = self.volume_credits_for(result)
         return result
 
-    def statement(self, invoice: Dict[str, Any], plays: Dict[str, Any]) -> str:
-        self.plays = plays
-        self.invoice = invoice
+    def create_statement_data(self, invoice: Dict[str, Any]):
         statement_data: Dict[str, Any] = {}
         statement_data["customer"] = invoice["customer"]
         statement_data["performances"] = list(map(self.enrich_performance, invoice["performances"]))
         statement_data["total_amount"] = self.total_amount(statement_data)
         statement_data["total_volume_credits"] = self.total_volume_credits(statement_data)
+        return statement_data
 
-        return self.render_plain_text(statement_data)
+    def statement(self, invoice: Dict[str, Any], plays: Dict[str, Any]) -> str:
+        self.plays = plays
+        self.invoice = invoice
+
+        return self.render_plain_text(self.create_statement_data(invoice))
