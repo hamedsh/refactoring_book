@@ -1,0 +1,81 @@
+[tool.poetry]
+name = "refactoringbook"
+version = "0.1"
+description = "code examples of Martin Fowler's Rafactoring book in python"
+authors = ["hamedsh <sheykhlou.h@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8.5"
+
+[tool.poetry.dev-dependencies]
+mypy = "^0.902"
+flakehell = "^0.9.0"
+flake8-docstrings = "^1.6.0"
+flake8-commas = "^2.0.0"
+flake8-quotes = "^3.2.0"
+flake8-bandit = "^2.1.2"
+black = "^21.6b0"
+flake8-bugbear = "^21.4.3"
+flake8-builtins = "^1.5.3"
+flake8-comprehensions = "^3.5.0"
+flake8-eradicate = "^1.0.0"
+flake8-isort = "^4.0.0"
+flake8-mutable = "^1.2.0"
+flake8-pytest-style = "^1.4.2"
+pep8-naming = "^0.11.1"
+pytest = "^6.2.4"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+# -----------------------------------------------flakehell
+[tool.flakehell]
+extended_default_ignore=[]
+exclude = ["README.rst", "README.md"]
+format = "colored"
+max_line_length = 88
+show_source = true
+whitelist = "../../allowlist.txt"
+
+[tool.flakehell.plugins]
+flake8-bandit = ["+*", "-S322"]
+flake8-bugbear = ["+*"]
+flake8-builtins = ["+*"]
+flake8-comprehensions = ["+*"]
+#flake8-darglint = ["+*"]
+flake8-docstrings = ["+*", "-D100"]
+flake8-eradicate = ["+*"]
+flake8-isort = ["+*"]
+flake8-mutable = ["+*"]
+flake8-pytest-style = ["+*"]
+#flake8-spellcheck = ["+*"]
+mccabe = ["+*"]
+pep8-naming = ["+*"]
+pycodestyle = ["+*"]
+pyflakes = ["+*"]
+pylint = ["+*"]
+
+#-----------------------------------------------black
+[tool.black]
+line-length = 88
+target-version = ['py36', 'py37', 'py38']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  # The following are specific to Black, you probably don't want those.
+  | blib2to3
+  | tests/data
+  | profiling
+)/
+'''
